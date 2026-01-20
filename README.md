@@ -1,10 +1,8 @@
-# Flowbase Admin Dashboard (Frontend Demo)
+# Flowbase Admin Dashboard
 
-This project is a **frontend-focused reconstruction of a multi-tenant B2B SaaS application**, created to demonstrate the UI architecture and design decisions I worked on during my internship at an early-stage HRMS and task management product.
+Flowbase is a **frontend-driven reconstruction of a multi-tenant B2B SaaS admin dashboard**, created to demonstrate **UI architecture, state management, and frontend–backend separation** based on my experience during an internship at an early-stage HRMS and task management product.
 
-It recreates core frontend concerns such as **role-based UI, workspace (organization) switching, routing control, and global layout structure**, using **mock data only** and without any proprietary code.
-
-Authentication is intentionally mocked in order to focus on **frontend architecture, state management, and routing logic**, rather than on implementing a full auth system.
+The project focuses on **realistic SaaS patterns** such as role-based UI, workspace (organization) switching, routing control, and global layout structure, while avoiding proprietary logic or production credentials.
 
 🇯🇵 日本語版はこちら → README_JA.md
 
@@ -12,49 +10,46 @@ Authentication is intentionally mocked in order to focus on **frontend architect
 
 ## Live Demo
 
-https://flowbase-five.vercel.app
+[https://flowbase-five.vercel.app](https://flowbase-five.vercel.app)
 
 Demo login available:
 
 - Admin dashboard
 - Member dashboard
 
-No credentials required (mock authentication).
+No credentials required (simulated authentication).
 
 ---
 
 ## Overview
 
-Flowbase is a mock B2B SaaS admin dashboard designed to demonstrate how a real-world product handles:
+Flowbase demonstrates how a real-world B2B SaaS product handles:
 
 - User roles (Admin / Member)
-- Multiple organizations (multi-tenant)
+- Multi-tenant workspaces (organizations)
 - Workspace selection after login
 - Role-based navigation and access control
+- Clear separation between data fetching and UI components
 
-The goal of this project is **not** to build a complete product, but to clearly communicate **frontend design decisions and application structure**.
+The goal of this project is **not** to build a production-ready service, but to clearly communicate **design decisions, architecture, and data flow** in a realistic SaaS context.
 
 ---
 
 ## Key Features
 
-### 🔐 Mock Authentication (Admin / Member)
+### 🔐 Simulated Authentication & Session State
 
-- Login is simulated using predefined mock users.
-- Two roles are supported:
-
-  - **Admin**: full access, multiple organizations
-  - **Member**: limited access, single organization
-
-- No real authentication or persistence is implemented by design.
+- Authentication is simulated to focus on **application architecture rather than auth implementation**.
+- Session state (user, role, selected organization) is managed via a client-side store.
+- Login behavior differs by role and organization count.
 
 ---
 
 ### 🏢 Multi-Tenant Workspace (Org Picker)
 
-- Users can belong to one or multiple organizations.
-- If a user belongs to multiple orgs, they are prompted to select a workspace after login.
-- The selected organization becomes the global context for the app.
+- Users may belong to one or multiple organizations.
+- Users with multiple organizations are prompted to select a workspace after login.
+- The selected organization becomes global application context.
 
 **Flow:**
 
@@ -64,61 +59,48 @@ Login → Org Picker (if multiple orgs) → Dashboard
 
 ---
 
-### 🧭 Role-Based Sidebar Navigation
+### 🧭 Role-Based Navigation & Access Control
 
-- Sidebar content changes depending on the user role.
-- Admin-only sections (e.g. Users, Billing) are hidden from non-admin users.
-- Navigation is driven by application state, not hardcoded assumptions.
+- Sidebar navigation dynamically changes based on user role.
+- Admin-only routes are protected at the page level.
+- Unauthorized access via direct URL navigation is explicitly handled.
 
 ---
 
-### 📊 Role-Specific Dashboard Content (Admin / Member)
+### 📊 Role-Specific Dashboards
 
-The dashboard content is intentionally **separated by user role**.
+Dashboard content is intentionally **separated by role**.
 
 While the overall layout and grid structure are shared for consistency,
-the information shown on the dashboard differs to reflect
-**organization-level responsibilities for admins** and
-**individual-level tasks for members**.
+the displayed information differs to reflect user responsibilities.
 
 #### **Admin Dashboard**
 
-- Org Health Summary
-- Pending Approvals
-- Onboarding & Compliance
-- Subscription & Billing
-- Recent Activity (organization-wide)
-- Quick Admin Actions
+- Organization health metrics
+- Pending approvals
+- Onboarding & compliance status
+- Subscription & billing overview
+- Organization-wide recent activity
+- Quick administrative actions
 
 #### **Member Dashboard**
 
-- My Tasks
-- My Onboarding Status
-- Recent Activity (personal)
-- My Profile
-- Documents & Requests
-- Help & Resources
-
-This separation ensures that each role sees information aligned with
-their responsibilities, and that role differences are expressed
-not only through navigation, but also through **dashboard structure and content**.
+- Personal task list
+- Onboarding progress
+- Recent personal activity
+- Profile summary
+- Documents & requests
+- Help & resources
 
 ---
 
-### 🚫 Route-Level Access Control
+### 🔁 Frontend–Backend Data Flow
 
-- Admin routes (e.g. `/admin/users`) are protected at the page level.
-- Even if a non-admin user manually navigates to an admin URL,
-  they are redirected to a **Not Authorized** page.
-- This ensures that access control is enforced beyond UI visibility.
+- Dashboard data is fetched from **Next.js API Routes**.
+- Container components handle data fetching and transformation.
+- UI components are purely presentational and receive typed props.
 
----
-
-### 🧩 Global Layout & Context Awareness
-
-- Header displays the currently selected organization.
-- The app clearly indicates **which workspace the user is operating in**.
-- Layout components respond to global state changes.
+This structure reflects how frontend-only prototypes are gradually replaced by API-driven architecture in real products.
 
 ---
 
@@ -128,76 +110,46 @@ not only through navigation, but also through **dashboard structure and content*
 - **UI**: React, Tailwind CSS
 - **State Management**: Zustand
 - **Routing**: Next.js built-in routing
-- **Data**: Mock data only (no backend)
+- **Backend (Demo)**: Next.js API Routes
 
 ---
 
 ## Routing & Flow Summary
 
 ```
-/               → Entry point (redirects based on state)
-/login          → Mock login (Admin / Member)
+/               → Entry point (redirects based on session)
+/login          → Simulated login
 /org-picker     → Workspace selection (multi-org users)
-/dashboard      → Main dashboard
+/dashboard      → Role-specific dashboard
 /admin/*        → Admin-only routes
 /not-authorized → Access denied page
 ```
 
 ---
 
-## Design Decisions
+## Design Principles
 
-### Why mock authentication?
-
-This project focuses on **frontend architecture**, not authentication flows.
-
-Mock users allow:
-
-- Faster iteration
-- Clear demonstration of role-based behavior
-- Easier explanation of routing and access control
-
----
-
-### Why page-level route guards?
-
-Access control is enforced directly in page components to ensure:
-
-- Security is not dependent on UI visibility alone
-- Direct URL access is properly handled
-- The logic is explicit and easy to reason about
-
----
-
-## UI / UX Design Approach
-
-The dashboard UI is designed around **role-based information priority**.
-
-Admin and Member dashboards share the same structural rules,
-while differing in content, hierarchy, and available actions
-based on user responsibilities.
-
-Cards are treated as presentational components only,
-while dashboard pages handle data composition
-and role-aware layout decisions.
+- Clear separation of concerns
+- Explicit role-based behavior
+- Container vs presentational component boundaries
+- Architecture that mirrors real SaaS products without unnecessary complexity
 
 ---
 
 ## Future Improvements
 
-- Persist session state (cookies or storage)
-- Connect active navigation state to router
-- Add real authentication
-- Expand admin pages with real data
+- Persistent sessions (cookies or storage)
+- Real authentication integration
+- Expanded admin features
+- API schema validation
 
 ---
 
 ## Notes
 
-This project is designed as a **portfolio piece** to demonstrate:
+This project is intended as a **portfolio piece** demonstrating:
 
-- Clear separation of concerns
-- Practical SaaS UI patterns
 - Thoughtful frontend architecture
-
-It intentionally avoids unnecessary complexity to keep the focus on structure and decision-making.
+- Practical SaaS UI patterns
+- Gradual transition from prototype to API-driven design
+- Clean and intentional component structure
