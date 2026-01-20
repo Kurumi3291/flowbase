@@ -27,7 +27,7 @@ const requests = [
 export default function RequestsTable() {
   return (
     <div className="mt-8 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div className="border-b border-gray-200 px-6 py-4 text-sm font-medium">
+      <div className="border-b border-gray-200 px-6 py-4 text-sm font-medium text-gray-900">
         Recent Requests
       </div>
 
