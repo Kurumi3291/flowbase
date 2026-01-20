@@ -10,6 +10,19 @@ Authentication is intentionally mocked in order to focus on **frontend architect
 
 ---
 
+## Live Demo
+
+https://flowbase-five.vercel.app
+
+Demo login available:
+
+- Admin dashboard
+- Member dashboard
+
+No credentials required (mock authentication).
+
+---
+
 ## Overview
 
 Flowbase is a mock B2B SaaS admin dashboard designed to demonstrate how a real-world product handles:
