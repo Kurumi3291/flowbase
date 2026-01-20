@@ -2,13 +2,22 @@
 
 import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/stores/sessionStore';
-import { mockUserAdmin, mockUserMember } from '@/mocks/users';
+
+type User = {
+  id: string;
+  name: string;
+  role: 'admin' | 'member';
+  orgIds: string[];
+};
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useSessionStore((s) => s.login);
 
-  const handleLoginWithUser = (user: typeof mockUserAdmin) => {
+  const handleLoginWithRole = async (role: 'admin' | 'member') => {
+    const res = await fetch(`/api/me?role=${role}`);
+    const user: User = await res.json();
+
     login(user);
 
     if (user.orgIds.length > 1) {
@@ -32,14 +41,14 @@ export default function LoginPage() {
           <div className="my-6 h-px bg-gray-200" />
 
           <button
-            onClick={() => handleLoginWithUser(mockUserAdmin)}
+            onClick={() => handleLoginWithRole('admin')}
             className="w-full rounded-md bg-gray-900 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition"
           >
             Continue as Admin
           </button>
 
           <button
-            onClick={() => handleLoginWithUser(mockUserMember)}
+            onClick={() => handleLoginWithRole('member')}
             className="mt-3 w-full rounded-md border border-gray-300 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
           >
             Continue as Member

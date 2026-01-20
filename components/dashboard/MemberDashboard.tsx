@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 import MyTasksCard from './cards/MyTasksCard';
 import MyOnboardingStatusCard from './cards/MyOnboardingStatusCard';
 import MyProfileCard from './cards/MyProfileCard';
@@ -5,44 +9,88 @@ import DocumentsRequestsCard from './cards/DocumentsRequestsCard';
 import RecentActivityCard from './cards/RecentActivityCard';
 import HelpResourcesCard from './cards/HelpResourcesCard';
 
-import { memberTasks } from '@/mocks/tasks';
-import { memberOnboarding } from '@/mocks/onboarding';
-import { memberProfile } from '@/mocks/profile';
-import { memberDocuments } from '@/mocks/documents';
-import { memberActivity } from '@/mocks/activity';
-import { helpResources } from '@/mocks/resources';
+type MemberProfileStatus = 'Active' | 'Inactive';
+
+type MemberDashboardData = {
+  member: {
+    tasks: any[];
+    onboarding: {
+      completedCount: number;
+      totalCount: number;
+      steps: any[];
+    };
+    profile: {
+      name: string;
+      role: string;
+      team: string;
+      status: MemberProfileStatus;
+    };
+    documents: {
+      submittedCount: number;
+      pendingCount: number;
+    };
+    activity: {
+      id: string;
+      text: string;
+    }[];
+    resources: {
+      id: string;
+      label: string;
+      href: string;
+    }[];
+  };
+};
 
 export default function MemberDashboard() {
+  const [data, setData] = useState<MemberDashboardData | null>(null);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      const res = await fetch('/api/dashboard?role=member');
+      const json = await res.json();
+      setData(json);
+    };
+
+    fetchDashboard();
+  }, []);
+
+  if (!data) return null;
+
+  const { member } = data;
+
   return (
     <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
-      {/* Primary */}
       <div className="lg:col-span-2">
-        <MyTasksCard tasks={memberTasks} />
+        <MyTasksCard tasks={member.tasks} />
       </div>
 
-      {/* Context */}
       <MyOnboardingStatusCard
-        completedCount={memberOnboarding.completedCount}
-        totalCount={memberOnboarding.totalCount}
-        steps={memberOnboarding.steps}
+        completedCount={member.onboarding.completedCount}
+        totalCount={member.onboarding.totalCount}
+        steps={member.onboarding.steps}
       />
 
-      {/* Secondary */}
       <MyProfileCard
-        name={memberProfile.name}
-        role={memberProfile.role}
-        team={memberProfile.team}
-        status={memberProfile.status}
+        name={member.profile.name}
+        role={member.profile.role}
+        team={member.profile.team}
+        status={member.profile.status}
       />
 
       <DocumentsRequestsCard
-        submittedCount={memberDocuments.submittedCount}
-        pendingCount={memberDocuments.pendingCount}
+        submittedCount={member.documents.submittedCount}
+        pendingCount={member.documents.pendingCount}
       />
 
-      {/* Tertiary */}
-      <RecentActivityCard activities={memberActivity} />
-      <HelpResourcesCard resources={helpResources} />
+      <RecentActivityCard
+        activities={member.activity.map((a) => ({
+          id: a.id,
+          label: a.text,
+          date: 'Today',
+        }))}
+      />
+
+      <HelpResourcesCard resources={member.resources} />
     </div>
   );
 }

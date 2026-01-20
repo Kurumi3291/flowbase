@@ -1,4 +1,7 @@
-// AdminDashboard.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
 import OrgHealthSummaryCard from './cards/OrgHealthSummaryCard';
 import PendingApprovalsCard from './cards/PendingApprovalsCard';
 import OnboardingComplianceCard from './cards/OnboardingComplianceCard';
@@ -6,28 +9,66 @@ import SubscriptionBillingCard from './cards/SubscriptionBillingCard';
 import RecentActivityCard from './cards/RecentActivityCard';
 import QuickAdminActionsCard from './cards/QuickAdminActionsCard';
 
-import { adminRecentActivities } from '@/mocks/adminRecentActivities';
+type DashboardData = {
+  admin: {
+    metrics: {
+      activeMembers: number;
+      pendingIssues: number;
+    };
+    approvals: {
+      invitations: number;
+      accessRequests: number;
+    };
+    onboarding: {
+      onboardingCount: number;
+      missingDocuments: number;
+    };
+    recentActivities: {
+      id: string;
+      text: string;
+    }[];
+    billing: {
+      plan: string;
+      trialRemainingDays: number;
+      nextInvoice: string;
+    };
+  };
+};
 
 export default function AdminDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      const res = await fetch('/api/dashboard');
+      const json = await res.json();
+      setData(json);
+    };
+
+    fetchDashboard();
+  }, []);
+
+  if (!data) return null;
+
+  const { admin } = data;
+
   return (
     <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {/* Row 1 */}
       <OrgHealthSummaryCard
-        activeMembers={42}
-        pendingIssues={3}
+        activeMembers={admin.metrics.activeMembers}
+        pendingIssues={admin.metrics.pendingIssues}
         status="Healthy"
         description="All core systems are operating normally."
       />
 
       <PendingApprovalsCard
-        invitationCount={2}
-        accessRequestCount={1}
+        invitationCount={admin.approvals.invitations}
+        accessRequestCount={admin.approvals.accessRequests}
       />
 
-      {/* Row 2 */}
       <OnboardingComplianceCard
-        onboardingCount={2}
-        missingDocuments={1}
+        onboardingCount={admin.onboarding.onboardingCount}
+        missingDocuments={admin.onboarding.missingDocuments}
         note="Some onboarding steps require attention."
       />
 
@@ -39,13 +80,18 @@ export default function AdminDashboard() {
         ]}
       />
 
-      {/* Row 3 */}
-      <RecentActivityCard activities={adminRecentActivities} />
+      <RecentActivityCard
+        activities={admin.recentActivities.map((a) => ({
+            id: a.id,
+            label: a.text,
+            date: 'Just now',
+        }))}
+       />
 
       <SubscriptionBillingCard
-        plan="Pro"
-        trialRemainingDays={7}
-        nextInvoice="$99 / month"
+        plan={admin.billing.plan}
+        trialRemainingDays={admin.billing.trialRemainingDays}
+        nextInvoice={admin.billing.nextInvoice}
       />
     </div>
   );
