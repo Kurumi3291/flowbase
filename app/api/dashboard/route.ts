@@ -9,8 +9,18 @@ export async function GET(req: Request) {
     return NextResponse.json({
       member: {
         tasks: [
-          { id: 't1', title: 'Complete onboarding', status: 'pending' },
-          { id: 't2', title: 'Review company handbook', status: 'done' },
+            {
+                id: 't1',
+                title: 'Complete onboarding',
+                status: 'pending',
+                dueAt: '2026-01-23',
+            },
+            {
+                id: 't2',
+                title: 'Review company handbook',
+                status: 'done',
+                dueAt: '2026-01-18',
+            },
         ],
         onboarding: {
           completedCount: 2,
@@ -23,7 +33,7 @@ export async function GET(req: Request) {
           ],
         },
         profile: {
-          name: 'Member User',
+          name: 'Alex Johnson',
           role: 'Member',
           team: 'Product',
           status: 'Active',

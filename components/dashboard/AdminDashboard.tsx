@@ -40,7 +40,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchDashboard = async () => {
-      const res = await fetch('/api/dashboard');
+      const res = await fetch('/api/dashboard?role=admin');
       const json = await res.json();
       setData(json);
     };

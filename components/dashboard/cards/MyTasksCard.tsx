@@ -1,13 +1,14 @@
 // MyTasksCard.tsx
 
-type TaskPriority = 'urgent' | 'normal' | 'optional';
+export type TaskPriority = 'urgent' | 'normal' | 'optional';
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   meta: string;
   priority: TaskPriority;
 }
+
 
 interface MyTasksCardProps {
   tasks: Task[];

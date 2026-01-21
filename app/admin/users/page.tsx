@@ -1,12 +1,20 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/stores/sessionStore';
 
 export default function AdminUsersPage() {
-  const role = useSessionStore.getState().user?.role;
+  const router = useRouter();
+  const role = useSessionStore((s) => s.user?.role);
 
-  if (role !== 'admin') {
-    redirect('/not-authorized');
-  }
+  useEffect(() => {
+    if (role && role !== 'admin') {
+      router.replace('/not-authorized');
+    }
+  }, [role, router]);
+
+  if (!role) return null;
 
   return (
     <div className="p-6">

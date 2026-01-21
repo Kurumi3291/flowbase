@@ -1,5 +1,5 @@
 // MyOnboardingStatusCard.tsx
-type OnboardingStep = {
+export type OnboardingStep = {
   id: string;
   label: string;
   status: 'completed' | 'pending';

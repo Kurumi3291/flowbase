@@ -1,7 +1,6 @@
 // MyProfileCard.tsx
 interface MyProfileCardProps {
   name: string;
-  role: string;
   team: string;
   status: 'Active' | 'Inactive';
 }
@@ -13,7 +12,6 @@ const statusClass: Record<MyProfileCardProps['status'], string> = {
 
 export default function MyProfileCard({
   name,
-  role,
   team,
   status,
 }: MyProfileCardProps) {
@@ -30,7 +28,7 @@ export default function MyProfileCard({
           </p>
 
           <p className="mt-1 text-xs text-gray-500">
-            {role} · {team}
+            {team} team
           </p>
 
           <p
