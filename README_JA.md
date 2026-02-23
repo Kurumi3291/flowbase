@@ -1,148 +1,123 @@
-# Flowbase Admin Dashboard（B2B SaaS 構造デモ）
+# Flowbase Admin Dashboard（B2B SaaS Structure Demo）
 
-本プロジェクトは、**マルチテナント型 B2B SaaS を想定した管理画面のフロントエンド構造**を示すデモアプリケーションです。
+Flowbase Admin Dashboard は、マルチテナント型 B2B SaaS 管理画面の構造理解を目的として制作したフロントエンドプロジェクトです。
 
-インターンシップで経験した HRMS およびタスク管理プロダクトにおける
-**ロール設計・組織（Workspace）切り替え・ルーティング制御・UI 構造設計**といった実務内容を、
-**個人プロジェクトとして再構築・整理**することを目的に制作しています。
+インターンシップで経験した HRMS およびタスク管理プロダクトにおける画面構造やユーザーフローをもとに、組織切り替え・ロール管理・画面遷移構造などを整理することを目的として作成しました。
 
-実際の業務で関わった設計判断やユーザーフローを、
-**プロプライエタリなコードを含まない形**で再現し、
-Next.js の API Routes を用いた **疑似バックエンド**を通じて
-フロントエンドとデータ取得の責務分離を明確にしています。
+本プロジェクトは完成したプロダクトではなく、設計理解を深めながら継続的に改善していくことを前提としたプロジェクトです。
 
 ---
 
-## デモ（Live Demo）
+## Demo
 
-[https://flowbase-five.vercel.app](https://flowbase-five.vercel.app)
+https://flowbase-five.vercel.app
 
-以下のデモログインが利用できます：
+認証は簡略化されており、ログイン情報の入力は不要です。
 
-- **Admin ダッシュボード**
-- **Member ダッシュボード**
+- Admin Dashboard
+- Member Dashboard
 
-認証は簡略化されており、
-**ユーザー名やパスワードの入力は不要**です。
-
----
-
-## プロジェクトの目的
-
-本プロジェクトの目的は、見た目の作り込みではなく、
-
-- 状態管理を前提とした画面構造
-- B2B SaaS における典型的なユーザーフロー
-- フロントエンドとデータ取得の責務分離
-- ロールに応じた UI / ルーティング設計
-
-を **コードと UI の両面から説明できる形で示すこと**です。
+を切り替えて確認できます。
 
 ---
 
-## 主な機能・構成
+## Project Purpose
 
-### ① 簡略化したログインとセッション管理（Admin / Member）
+本プロジェクトでは、見た目の作り込みよりも以下を重視しています。
 
-- 実運用を想定した認証機能は実装していません
-- ロール・所属組織・選択中の Workspace を状態として管理しています
+- B2B SaaS における典型的なユーザーフロー理解
+- ロールに応じた UI / ルーティング構造
+- 状態管理を前提とした画面設計
+- フロントエンドとデータ取得責務の分離
 
-**対応ロール**
-
-- **Admin**：複数組織に所属、管理者権限あり
-- **Member**：単一組織のみ、管理者権限なし
-
-認証を簡略化することで、
-**画面遷移・状態管理・構造設計に集中**しています。
+インターンで触れた実務構造を、公開可能な形で整理し直すことを目的としています。
 
 ---
 
-### ② マルチテナント対応（Org Picker）
+## Main Features
 
-- ユーザーは 1 つまたは複数の組織（Workspace）に所属可能
-- 複数組織を持つユーザーは、ログイン後に組織選択画面へ遷移します
-- 選択した組織はアプリ全体のコンテキストとして保持されます
+### Multi-tenant Structure（Org Picker）
 
-**ログイン後のフロー**
+複数組織に所属するユーザーはログイン後に組織選択画面へ遷移します。
 
-```
-ログイン
-→（複数組織の場合）Org Picker
-→ ダッシュボード
-```
+Login → Org Picker → Dashboard
+
+選択された Workspace はアプリ全体のコンテキストとして保持されます。
 
 ---
 
-### ③ ロール別サイドバーナビゲーション
+### Role-based Navigation
 
-- Sidebar はログインユーザーのロールに応じて内容が変化
-- Admin のみが閲覧できる管理系メニューを明確に分離
-- UI 表示とルートガードを組み合わせて制御
+Sidebar はログインユーザーのロールに応じて内容が変化します。
 
----
+- Admin：管理機能を表示
+- Member：個人機能のみ表示
 
-### ④ ダッシュボード構成（Admin / Member 分離）
-
-管理者（Admin）と一般ユーザー（Member）で
-**ダッシュボードの内容を明確に分離**しています。
-
-レイアウト構造は共通としつつ、
-表示する情報はそれぞれの責務に応じて切り替えています。
-
-- **Admin Dashboard**
-
-  - Org Health Summary
-  - Pending Approvals
-  - Onboarding & Compliance
-  - Subscription & Billing
-  - Recent Activity（組織全体）
-  - Quick Admin Actions
-
-- **Member Dashboard**
-
-  - My Tasks
-  - My Onboarding Status
-  - Recent Activity（個人）
-  - My Profile
-  - Documents & Requests
-  - Help & Resources
+UI表示とルーティング制御の両方でアクセスを制御しています。
 
 ---
 
-### ⑤ 管理者専用ルートのアクセス制御
+### Dashboard Separation
 
-- `/admin/*` 配下は管理者専用ルートとして実装
-- 非管理者が URL を直接入力した場合でも
-  Not Authorized ページへリダイレクト
-- UI 表示に依存しない、ページ単位でのガードを採用
+Admin と Member で表示内容を明確に分離しています。
 
----
+Admin Dashboard:
 
-### ⑥ データ取得と責務分離
+- Org Health Summary
+- Pending Approvals
+- Onboarding & Compliance
+- Subscription Status
+- Organization Activity
 
-- ダッシュボードのデータは Next.js API Routes から取得
-- Dashboard（container）がデータ整形を担当
-- Card コンポーネントは表示専用（presentational）
+Member Dashboard:
 
-**フロントエンド主体のプロトタイプが
-API 駆動構成へ移行していく過程を意識した設計**です。
-
----
-
-## 技術スタック
-
-- **Framework**：Next.js（App Router）
-- **UI**：React / Tailwind CSS
-- **状態管理**：Zustand
-- **ルーティング**：Next.js 標準ルーティング
-- **API（デモ）**：Next.js API Routes
+- My Tasks
+- Onboarding Status
+- Personal Activity
+- Documents
+- Help Resources
 
 ---
 
-## 補足
+### Route Guard
 
-本プロジェクトは、
-**「実装力」だけでなく「設計意図を説明できること」**を重視した
-ポートフォリオ作品として制作しています。
+/admin 配下は管理者専用ルートとして制御しています。
 
-実務での再現性・拡張性を意識した構成になっています。
+権限のないユーザーが直接URLへアクセスした場合は Not Authorized ページへリダイレクトされます。
+
+---
+
+### Data Responsibility Separation
+
+ダッシュボードデータは Next.js API Routes から取得します。
+
+- Container：データ取得と整形
+- Presentational Component：表示責務のみ
+
+フロントエンド主体のプロトタイプから API 駆動構成へ移行することを意識しています。
+
+---
+
+## Tech Stack
+
+- Next.js（App Router）
+- React
+- Tailwind CSS
+- Zustand
+- Next.js API Routes（Mock API）
+
+---
+
+## Future Direction
+
+Flowbase は完成した作品ではなく、継続的に発展させていくプロジェクトです。
+
+今後予定している改善：
+
+- 状態管理構造の見直し
+- 実バックエンドとの連携
+- 認証・権限制御の現実的実装
+- ドメイン理解を踏まえた画面設計改善
+- SaaSプロダクトとしての機能追加
+
+設計理解を深めながら育てていくプロジェクトとして継続しています。
