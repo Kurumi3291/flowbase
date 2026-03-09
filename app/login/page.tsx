@@ -2,40 +2,29 @@
 
 import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/stores/sessionStore';
-
-type User = {
-  id: string;
-  name: string;
-  role: 'admin' | 'member';
-  orgIds: string[];
-};
+import type { Employee } from '@/types/employee';
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useSessionStore((s) => s.login);
 
-  const handleLoginWithRole = async (role: 'admin' | 'member') => {
-    const res = await fetch(`/api/me?role=${role}`);
-    const user: User = await res.json();
+  const handleLoginWithRole = async (userRole: 'admin' | 'employee') => {
+    const res = await fetch(
+      `/api/me?role=${userRole === 'admin' ? 'admin' : 'member'}`
+    );
+    const user: Employee = await res.json();
 
     login(user);
-
-    if (user.orgIds.length > 1) {
-      router.push('/org-picker');
-    } else {
-      router.push('/dashboard');
-    }
+    router.push('/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="rounded-xl bg-white p-8 shadow-sm border border-gray-200">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Flowbase
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Flowbase</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Sign in to your workspace
+            Sign in to the HR management system
           </p>
 
           <div className="my-6 h-px bg-gray-200" />
@@ -48,10 +37,10 @@ export default function LoginPage() {
           </button>
 
           <button
-            onClick={() => handleLoginWithRole('member')}
+            onClick={() => handleLoginWithRole('employee')}
             className="mt-3 w-full rounded-md border border-gray-300 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
           >
-            Continue as Member
+            Continue as Employee
           </button>
 
           <p className="mt-4 text-xs text-gray-400 text-center">

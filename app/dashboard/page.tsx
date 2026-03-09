@@ -10,7 +10,13 @@ import MemberDashboard from '@/components/dashboard/MemberDashboard';
 export default function DashboardPage() {
   const user = useSessionStore((s) => s.user);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-sm text-gray-500">
+        Loading user...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -19,7 +25,7 @@ export default function DashboardPage() {
         <Sidebar />
 
         <main className="flex-1 p-6 sm:p-8">
-          {user.role === 'admin' ? (
+          {user.userRole === 'admin' ? (
             <AdminDashboard />
           ) : (
             <MemberDashboard />

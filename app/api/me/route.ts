@@ -1,25 +1,19 @@
-//app/api/me/route.ts
-
+// app/api/me/route.ts
 import { NextResponse } from 'next/server';
+import { mockEmployees } from '@/lib/mockEmployees';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const role = searchParams.get('role');
 
-  if (role === 'admin') {
-    return NextResponse.json({
-      id: 'user_admin',
-      name: 'Admin User',
-      role: 'admin',
-      orgIds: ['org_1', 'org_2'],
-    });
+  const currentUser =
+    role === 'admin'
+      ? mockEmployees.find((employee) => employee.userRole === 'admin')
+      : mockEmployees.find((employee) => employee.id === 'emp_002');
+
+  if (!currentUser) {
+    return NextResponse.json({ message: 'User not found' }, { status: 404 });
   }
 
-  return NextResponse.json({
-    id: 'user_member',
-    name: 'Member User',
-    role: 'member',
-    orgIds: ['org_1'],
-  });
+  return NextResponse.json(currentUser);
 }
-

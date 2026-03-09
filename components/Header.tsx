@@ -1,9 +1,6 @@
 'use client';
 
-import { useSessionStore } from '@/stores/sessionStore';
-
 export default function Header() {
-  const selectedOrg = useSessionStore((s) => s.selectedOrg);
 
   return (
     <header className="sticky top-0 z-20 border-b border-gray-200 bg-white">
@@ -33,14 +30,6 @@ export default function Header() {
           <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
             <span>Flowbase</span>
 
-            {selectedOrg && (
-              <>
-                <span className="text-gray-300">/</span>
-                <span className="font-normal text-gray-600">
-                  {selectedOrg.name}
-                </span>
-              </>
-            )}
           </div>
         </div>
 
