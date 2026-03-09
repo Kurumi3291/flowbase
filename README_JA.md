@@ -1,123 +1,239 @@
-# Flowbase Admin Dashboard（B2B SaaS Structure Demo）
+# HRMS Admin Dashboard（小規模IT企業向け社員管理システム）
 
-Flowbase Admin Dashboard は、マルチテナント型 B2B SaaS 管理画面の構造理解を目的として制作したフロントエンドプロジェクトです。
+このプロジェクトは、小規模IT企業向けのHRMS（Human Resource Management System）を想定したフロントエンドアプリケーションです。
 
-インターンシップで経験した HRMS およびタスク管理プロダクトにおける画面構造やユーザーフローをもとに、組織切り替え・ロール管理・画面遷移構造などを整理することを目的として作成しました。
+HR担当者が社員情報を管理し、社員自身も自分のプロフィール情報を確認できる社内向け管理システムを想定しています。
 
-本プロジェクトは完成したプロダクトではなく、設計理解を深めながら継続的に改善していくことを前提としたプロジェクトです。
+もともとはマルチテナント型SaaSの管理画面テンプレートをベースにしていましたが、本プロジェクトでは「組織（organization）中心」の設計から「社員（Employee）中心」のHRMS構造へリファクタリングしています。
 
----
+このプロジェクトの目的は以下です。
 
-## Demo
+- 社内管理システムのUI構造の理解
+- role-based UI設計
+- Employee中心のドメイン設計
+- フロントエンドとAPI責務の分離
+
+# デモ
 
 https://flowbase-five.vercel.app
 
-認証は簡略化されており、ログイン情報の入力は不要です。
+認証は簡略化されています。
+
+ログイン情報の入力は不要で、以下の画面を確認できます。
 
 - Admin Dashboard
-- Member Dashboard
+- Employee Dashboard
 
-を切り替えて確認できます。
+# 想定している会社構成
 
----
+このシステムは社員数約30人の小規模IT企業を想定しています。
 
-## Project Purpose
+## 経営
 
-本プロジェクトでは、見た目の作り込みよりも以下を重視しています。
+- CEO / Founder：1
 
-- B2B SaaS における典型的なユーザーフロー理解
-- ロールに応じた UI / ルーティング構造
-- 状態管理を前提とした画面設計
-- フロントエンドとデータ取得責務の分離
+## プロダクト・開発（16）
 
-インターンで触れた実務構造を、公開可能な形で整理し直すことを目的としています。
+- Engineering Manager：1
+- Frontend Engineer：6
+- Backend Engineer：6
+- QA Engineer：2
 
----
+## デザイン（3）
 
-## Main Features
+- Lead Designer：1
+- UI/UX Designer：2
 
-### Multi-tenant Structure（Org Picker）
+## プロダクト管理（2）
 
-複数組織に所属するユーザーはログイン後に組織選択画面へ遷移します。
+- Product Manager：2
 
-Login → Org Picker → Dashboard
+## ビジネス（5）
 
-選択された Workspace はアプリ全体のコンテキストとして保持されます。
+- Sales：3
+- Marketing：2
 
----
+## 管理部門（2）
 
-### Role-based Navigation
+- HR / People Operations：1
+- Finance / Admin：1
 
-Sidebar はログインユーザーのロールに応じて内容が変化します。
+合計：約30人
 
-- Admin：管理機能を表示
-- Member：個人機能のみ表示
+小規模IT企業ではHR担当が少人数であることが多いため、このシステムはシンプルな社員情報管理にフォーカスしています。
 
-UI表示とルーティング制御の両方でアクセスを制御しています。
+# ユーザー
 
----
+このシステムには2種類のユーザーが存在します。
 
-### Dashboard Separation
+## Admin（HR担当）
 
-Admin と Member で表示内容を明確に分離しています。
+HR担当者は社員情報を管理します。
 
-Admin Dashboard:
+できること：
 
-- Org Health Summary
-- Pending Approvals
-- Onboarding & Compliance
-- Subscription Status
-- Organization Activity
+- 社員一覧を見る
+- 社員詳細を見る
+- 社員情報を編集する
+- ダッシュボードで社員全体の状況を確認する
 
-Member Dashboard:
+## Employee（一般社員）
 
-- My Tasks
-- Onboarding Status
-- Personal Activity
-- Documents
-- Help Resources
+社員自身が自分の情報を確認します。
 
----
+できること：
 
-### Route Guard
+- 自分のプロフィールを見る
+- 所属部署や職種を確認する
+- 自分向けのダッシュボードを見る
 
-/admin 配下は管理者専用ルートとして制御しています。
+# Employeeデータ設計
 
-権限のないユーザーが直接URLへアクセスした場合は Not Authorized ページへリダイレクトされます。
+このシステムはEmployee（社員）データを中心に設計されています。
 
----
+```ts
+type Employee = {
+  id: string
+  name: string
+  email: string
+  department: string
+  jobTitle: string
+  joinedDate: string
+  status: 'active' | 'inactive'
+  userRole: 'admin' | 'employee'
+}
+ここで重要なのは jobTitle と userRole を分けている点です。
 
-### Data Responsibility Separation
+例：
+jobTitle: Frontend Engineer
+userRole: employee
 
-ダッシュボードデータは Next.js API Routes から取得します。
 
-- Container：データ取得と整形
-- Presentational Component：表示責務のみ
+- jobTitle：会社内での職種
+- userRole：システム上の権限
 
-フロントエンド主体のプロトタイプから API 駆動構成へ移行することを意識しています。
+これにより、職種とシステム権限を独立して管理できる設計になっています。
 
----
 
-## Tech Stack
+# 主な機能
+
+## Role-based Dashboard
+
+ログインユーザーの role に応じて表示内容が変わります。
+
+### Admin Dashboard
+
+HR担当者向けに社員全体の状況を確認できます。
+
+例：
+
+- total employees
+- active employees
+- departments
+- recent hires
+
+
+### Employee Dashboard
+
+社員自身のプロフィール情報を確認できます。
+
+例：
+
+- name
+- department
+- job title
+- joined date
+- status
+
+
+# Employee管理（Admin）
+
+管理者は以下の流れで社員情報を管理できます。
+Employee List → Employee Detail → Edit Employee
+
+
+
+## Employee List
+
+社員一覧を表示します。
+
+表示情報：
+
+- name
+- department
+- job title
+- status
+
+
+## Employee Detail
+
+社員の詳細情報を確認できます。
+
+表示情報：
+
+- name
+- email
+- department
+- job title
+- joined date
+- status
+
+
+## Edit Employee
+
+管理者は以下の情報を編集できます。
+
+- department
+- job title
+- status
+
+現在の実装では mock update（擬似更新）となっており、ページリロード後は元のデータに戻ります。
+
+
+# システム構成
+
+本プロジェクトではフロントエンド構造の整理を重視しています。
+
+主なポイント：
+
+- role に応じた UI 分岐
+- Employee 中心のドメイン構造
+- UI とデータ取得の責務分離
+
+データ取得は Next.js API Routes を利用した Mock API で行っています。
+
+
+# 技術スタック
 
 - Next.js（App Router）
 - React
+- TypeScript
 - Tailwind CSS
-- Zustand
+- Zustand（状態管理）
 - Next.js API Routes（Mock API）
 
----
 
-## Future Direction
+# 今後の改善予定
 
-Flowbase は完成した作品ではなく、継続的に発展させていくプロジェクトです。
+今後の改善として以下を予定しています。
 
-今後予定している改善：
+- 社員情報更新 API の実装
+- データベースとの連携
+- 認証処理の改善
+- HR ダッシュボードの拡張
+- オンボーディング管理機能の追加
 
-- 状態管理構造の見直し
-- 実バックエンドとの連携
-- 認証・権限制御の現実的実装
-- ドメイン理解を踏まえた画面設計改善
-- SaaSプロダクトとしての機能追加
 
-設計理解を深めながら育てていくプロジェクトとして継続しています。
+# プロジェクトの目的
+
+このプロジェクトは完成した HR システムではなく、設計理解を目的としたプロジェクトです。
+
+特に以下を意識しています。
+
+- SaaS テンプレートからドメイン設計を変更するプロセス
+- 社内管理システムの UI 構造
+- role-based アプリケーション設計
+- Employee 中心のデータモデリング
+
+実際の HRMS プロダクトの構造理解を深めることを目的としています。
+```
