@@ -1,92 +1,80 @@
-//app/admin/employees/[id]/edit/page.tsx
+//app/admin/employees/new/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import type { Employee } from '@/types/employee';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { EmployeeStatus, UserRole } from '@/types/employee';
 
-export default function EditEmployeePage() {
-  const params = useParams();
+type FormState = {
+  name: string;
+  email: string;
+  department: string;
+  jobTitle: string;
+  joinedDate: string;
+  status: EmployeeStatus;
+  userRole: UserRole;
+};
+
+export default function NewEmployeePage() {
   const router = useRouter();
 
-  const [employee, setEmployee] = useState<Employee | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState<FormState>({
+    name: '',
+    email: '',
+    department: '',
+    jobTitle: '',
+    joinedDate: '',
+    status: 'active',
+    userRole: 'employee',
+  });
 
-  useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        const employeeId = Array.isArray(params.id) ? params.id[0] : params.id;
-        const res = await fetch(`/api/employees/${employeeId}`);
-
-        if (res.status === 404) {
-          setEmployee(null);
-          return;
-        }
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch employee');
-        }
-
-        const data: Employee = await res.json();
-        setEmployee(data);
-      } catch (error) {
-        console.error('Failed to fetch employee:', error);
-        setEmployee(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployee();
-  }, [params.id]);
-
-  if (loading) {
-    return <div>Loading employee...</div>;
-  }
-
-  if (!employee) {
-    return <div>Employee not found.</div>;
-  }
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setEmployee({
-      ...employee,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!employee) return;
+    setSubmitting(true);
 
     try {
-      const res = await fetch(`/api/employees/${employee.id}`, {
-        method: 'PUT',
+      const newEmployee = {
+        id: crypto.randomUUID(),
+        ...form,
+      };
+
+      const res = await fetch('/api/employees', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(employee),
+        body: JSON.stringify(newEmployee),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update employee');
+        throw new Error('Failed to create employee');
       }
 
-      router.push(`/admin/employees/${employee.id}`);
+      router.push('/admin/employees');
     } catch (error) {
-      console.error('Failed to update employee:', error);
+      console.error('Failed to create employee:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Edit Employee</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Add Employee</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Update employee information.
+          Create a new employee record.
         </p>
       </div>
 
@@ -95,7 +83,29 @@ export default function EditEmployeePage() {
           <Input
             label="Name"
             name="name"
-            value={employee.name}
+            value={form.name}
+            onChange={handleChange}
+          />
+
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+          />
+
+          <Input
+            label="Department"
+            name="department"
+            value={form.department}
+            onChange={handleChange}
+          />
+
+          <Input
+            label="Job Title"
+            name="jobTitle"
+            value={form.jobTitle}
             onChange={handleChange}
           />
 
@@ -103,37 +113,15 @@ export default function EditEmployeePage() {
             label="Joined Date"
             name="joinedDate"
             type="date"
-            value={employee.joinedDate}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Email"
-            name="email"
-            value={employee.email}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Department"
-            name="department"
-            value={employee.department}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Job Title"
-            name="jobTitle"
-            value={employee.jobTitle}
+            value={form.joinedDate}
             onChange={handleChange}
           />
 
           <div>
             <label className="block text-sm text-gray-500">Status</label>
-
             <select
               name="status"
-              value={employee.status}
+              value={form.status}
               onChange={handleChange}
               className="mt-1 w-full rounded-md border border-gray-200 px-3 py-2"
             >
@@ -144,10 +132,9 @@ export default function EditEmployeePage() {
 
           <div>
             <label className="block text-sm text-gray-500">User Role</label>
-
             <select
               name="userRole"
-              value={employee.userRole}
+              value={form.userRole}
               onChange={handleChange}
               className="mt-1 w-full rounded-md border border-gray-200 px-3 py-2"
             >
@@ -156,12 +143,23 @@ export default function EditEmployeePage() {
             </select>
           </div>
 
-          <button
-            type="submit"
-            className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800"
-          >
-            Save Changes
-          </button>
+          <div className="flex gap-2 pt-2">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? 'Saving...' : 'Save Employee'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => router.push('/admin/employees')}
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </>
@@ -176,11 +174,16 @@ type InputProps = {
   type?: string;
 };
 
-function Input({ label, name, value, onChange, type = 'text' }: InputProps) {
+function Input({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+}: InputProps) {
   return (
     <div>
       <label className="block text-sm text-gray-500">{label}</label>
-
       <input
         type={type}
         name={name}

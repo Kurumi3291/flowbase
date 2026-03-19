@@ -1,3 +1,4 @@
+// app/login/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -9,13 +10,19 @@ export default function LoginPage() {
   const login = useSessionStore((s) => s.login);
 
   const handleLoginWithRole = async (userRole: 'admin' | 'employee') => {
-    const res = await fetch(
-      `/api/me?role=${userRole === 'admin' ? 'admin' : 'member'}`
-    );
+    const res = await fetch(`/api/me?role=${userRole}`);
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch user');
+    }
+
     const user: Employee = await res.json();
 
     login(user);
-    router.push('/dashboard');
+
+    router.push(
+      userRole === 'admin' ? '/admin/dashboard' : '/employee/dashboard'
+    );
   };
 
   return (
