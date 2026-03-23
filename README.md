@@ -1,8 +1,8 @@
-# Flowbase Admin Dashboard
+# Flowbase HRMS
 
-Flowbase is a **frontend-driven reconstruction of a multi-tenant B2B SaaS admin dashboard**, created to demonstrate **UI architecture, state management, and frontend–backend separation** based on my experience during an internship at an early-stage HRMS and task management product.
+Flowbase is a **Human Resource Management System (HRMS)** built with Next.js and Supabase, designed to demonstrate **full CRUD operations, API integration, and role-based UI architecture**.
 
-The project focuses on **realistic SaaS patterns** such as role-based UI, workspace (organization) switching, routing control, and global layout structure, while avoiding proprietary logic or production credentials.
+This project focuses on building a **realistic internal admin tool** with a clean frontend–backend separation and database-driven data flow.
 
 🇯🇵 日本語版はこちら → README_JA.md
 
@@ -10,97 +10,79 @@ The project focuses on **realistic SaaS patterns** such as role-based UI, worksp
 
 ## Live Demo
 
-[https://flowbase-five.vercel.app](https://flowbase-five.vercel.app)
+https://flowbase-five.vercel.app
 
-Demo login available:
+Demo login:
 
-- Admin dashboard
-- Member dashboard
+- Admin view
+- Employee view
 
-No credentials required (simulated authentication).
+Authentication is simulated (no credentials required).
 
 ---
 
 ## Overview
 
-Flowbase demonstrates how a real-world B2B SaaS product handles:
+Flowbase HRMS is a simplified employee management system where:
 
-- User roles (Admin / Member)
-- Multi-tenant workspaces (organizations)
-- Workspace selection after login
-- Role-based navigation and access control
-- Clear separation between data fetching and UI components
+- Admin users can manage employees (CRUD)
+- Employee users can view their own profile and dashboard
+- Data is stored and managed in a real database (Supabase)
 
-The goal of this project is **not** to build a production-ready service, but to clearly communicate **design decisions, architecture, and data flow** in a realistic SaaS context.
+This project demonstrates how a frontend application evolves from mock data to a fully integrated backend system.
 
 ---
 
 ## Key Features
 
-### 🔐 Simulated Authentication & Session State
+### 👥 Employee Management (CRUD)
 
-- Authentication is simulated to focus on **application architecture rather than auth implementation**.
-- Session state (user, role, selected organization) is managed via a client-side store.
-- Login behavior differs by role and organization count.
+- Create new employees
+- View employee list
+- View employee details
+- Edit employee information
+- Delete employees
 
----
-
-### 🏢 Multi-Tenant Workspace (Org Picker)
-
-- Users may belong to one or multiple organizations.
-- Users with multiple organizations are prompted to select a workspace after login.
-- The selected organization becomes global application context.
-
-**Flow:**
-
-```
-Login → Org Picker (if multiple orgs) → Dashboard
-```
+All operations are connected to a real database.
 
 ---
 
-### 🧭 Role-Based Navigation & Access Control
+### 🧩 Supabase Integration
 
-- Sidebar navigation dynamically changes based on user role.
-- Admin-only routes are protected at the page level.
-- Unauthorized access via direct URL navigation is explicitly handled.
-
----
-
-### 📊 Role-Specific Dashboards
-
-Dashboard content is intentionally **separated by role**.
-
-While the overall layout and grid structure are shared for consistency,
-the displayed information differs to reflect user responsibilities.
-
-#### **Admin Dashboard**
-
-- Organization health metrics
-- Pending approvals
-- Onboarding & compliance status
-- Subscription & billing overview
-- Organization-wide recent activity
-- Quick administrative actions
-
-#### **Member Dashboard**
-
-- Personal task list
-- Onboarding progress
-- Recent personal activity
-- Profile summary
-- Documents & requests
-- Help & resources
+- Replaced mock data with Supabase
+- Built API routes for:
+  - GET / POST / PUT / DELETE
+- Data persists across reloads
 
 ---
 
-### 🔁 Frontend–Backend Data Flow
+### 🔐 Simulated Authentication & Role Switching
 
-- Dashboard data is fetched from **Next.js API Routes**.
-- Container components handle data fetching and transformation.
-- UI components are purely presentational and receive typed props.
+- Role-based UI (Admin / Employee)
+- Admin → management screens
+- Employee → personal dashboard & profile
+- Authentication is intentionally simplified to focus on application logic
 
-This structure reflects how frontend-only prototypes are gradually replaced by API-driven architecture in real products.
+---
+
+### 📊 Employee Dashboard
+
+- Displays:
+  - Name
+  - Department
+  - Job Title
+  - Status
+- Data is fetched from the database via API
+
+---
+
+### 🏗️ Architecture
+
+- Next.js API Routes as backend layer
+- Clear separation between:
+  - Data fetching (API)
+  - UI components
+- Type-safe data handling with TypeScript
 
 ---
 
@@ -109,47 +91,44 @@ This structure reflects how frontend-only prototypes are gradually replaced by A
 - **Framework**: Next.js (App Router)
 - **UI**: React, Tailwind CSS
 - **State Management**: Zustand
-- **Routing**: Next.js built-in routing
-- **Backend (Demo)**: Next.js API Routes
+- **Backend**: Next.js API Routes
+- **Database**: Supabase
 
 ---
 
-## Routing & Flow Summary
+## Routing
 
-```
-/               → Entry point (redirects based on session)
-/login          → Simulated login
-/org-picker     → Workspace selection (multi-org users)
-/dashboard      → Role-specific dashboard
-/admin/*        → Admin-only routes
-/not-authorized → Access denied page
-```
+/login
+/admin/employees
+/admin/employees/[id]
+/employee/dashboard
+/employee/profile
 
 ---
 
-## Design Principles
+## What This Project Demonstrates
 
-- Clear separation of concerns
-- Explicit role-based behavior
-- Container vs presentational component boundaries
-- Architecture that mirrors real SaaS products without unnecessary complexity
+- Full CRUD implementation
+- API design and integration
+- Migration from mock data to real database
+- Role-based UI design
+- Practical internal tool architecture
 
 ---
 
 ## Future Improvements
 
-- Persistent sessions (cookies or storage)
-- Real authentication integration
-- Expanded admin features
-- API schema validation
+- Real authentication (Supabase Auth)
+- Filtering and search functionality
+- Pagination
+- Better error handling and UI feedback
 
 ---
 
 ## Notes
 
-This project is intended as a **portfolio piece** demonstrating:
+This project is built as a **portfolio piece** to demonstrate:
 
-- Thoughtful frontend architecture
-- Practical SaaS UI patterns
-- Gradual transition from prototype to API-driven design
-- Clean and intentional component structure
+- Practical frontend + backend integration
+- Real-world admin system patterns
+- Clean, maintainable architecture
