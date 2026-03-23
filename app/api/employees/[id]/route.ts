@@ -1,6 +1,6 @@
 //app/api/employees/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { mockEmployees } from '@/lib/mockEmployees';
+import { supabase } from '@/lib/supabase';
 import type { Employee } from '@/types/employee';
 
 type Props = {
@@ -9,17 +9,34 @@ type Props = {
   }>;
 };
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(_: Request, { params }: Props) {
   const { id } = await params;
 
-  const employee = mockEmployees.find((item) => item.id === id);
+  const { data, error } = await supabase
+    .from('employees')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  if (!employee) {
+  if (error || !data) {
     return NextResponse.json(
       { message: 'Employee not found' },
       { status: 404 }
     );
   }
+
+  const employee: Employee = {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    department: data.department ?? '',
+    jobTitle: data.jobTitle ?? '',
+    joinedDate: data.joinedDate ?? '',
+    status: data.status ?? 'active',
+    userRole: data.userRole ?? 'employee',
+  };
 
   return NextResponse.json(employee);
 }
@@ -29,9 +46,25 @@ export async function PUT(req: Request, { params }: Props) {
     const { id } = await params;
     const body = (await req.json()) as Employee;
 
-    const employeeIndex = mockEmployees.findIndex((item) => item.id === id);
+    const employeeToUpdate = {
+      name: body.name,
+      email: body.email,
+      department: body.department,
+      jobTitle: body.jobTitle,
+      joinedDate: body.joinedDate,
+      status: body.status,
+      userRole: body.userRole,
+    };
 
-    if (employeeIndex === -1) {
+    const { data, error } = await supabase
+      .from('employees')
+      .update(employeeToUpdate)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.error('Supabase update error:', error);
       return NextResponse.json(
         { message: 'Employee not found' },
         { status: 404 }
@@ -39,12 +72,15 @@ export async function PUT(req: Request, { params }: Props) {
     }
 
     const updatedEmployee: Employee = {
-      ...mockEmployees[employeeIndex],
-      ...body,
-      id,
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      department: data.department ?? '',
+      jobTitle: data.jobTitle ?? '',
+      joinedDate: data.joinedDate ?? '',
+      status: data.status ?? 'active',
+      userRole: data.userRole ?? 'employee',
     };
-
-    mockEmployees[employeeIndex] = updatedEmployee;
 
     return NextResponse.json(updatedEmployee);
   } catch (error) {
@@ -59,16 +95,15 @@ export async function PUT(req: Request, { params }: Props) {
 export async function DELETE(_: Request, { params }: Props) {
   const { id } = await params;
 
-  const index = mockEmployees.findIndex((item) => item.id === id);
+  const { error } = await supabase.from('employees').delete().eq('id', id);
 
-  if (index === -1) {
+  if (error) {
+    console.error('Supabase delete error:', error);
     return NextResponse.json(
       { message: 'Employee not found' },
       { status: 404 }
     );
   }
-
-  mockEmployees.splice(index, 1);
 
   return NextResponse.json({ message: 'Deleted successfully' });
 }
